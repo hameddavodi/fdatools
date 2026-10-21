@@ -58,7 +58,7 @@ Order matters: `_backend` → `basis` → `core`.
 - [x] sklearn compliance: `sklearn.utils.estimator_checks.check_estimator` passes for `Smoother`, `FPCA`, `FRegress` (and `Registrator`; no exemptions)
 - [x] `nn.py` (extra `[torch]`): `BasisLayer`, `SmoothingLayer`, `FDataDataset`; gradcheck on all layers; GPU test skipped-if-unavailable
 
-**GATE 3:** `pytest tests/parity tests/sklearn_compat tests/torch tests/unit --cov=fdatools --cov-fail-under=90`
+**GATE 3:** `pytest tests/parity tests/sklearn_compat tests/torch_backend tests/unit --cov=fdatools --cov-fail-under=90`
 (2026-09-27: `tests/unit` added, as for GATE 2. Without it the package coverage is 76%. With it: 98.6%. The 90% bar is unchanged.)
 
 ---

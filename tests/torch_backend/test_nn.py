@@ -21,6 +21,7 @@ from fdatools.smoothing import smooth
 pytest.importorskip("torch", reason="torch extra not installed")
 
 import torch
+
 from fdatools import nn as fnn
 
 DOMAIN = (0.0, 1.0)

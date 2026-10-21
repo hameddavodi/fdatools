@@ -33,7 +33,7 @@ Read `CLAUDE.md`, `SPEC.md`, `WORKFLOW.md` first. This file adds the concrete me
 - Parity tests in `tests/parity/test_<module>.py` load via `tests/parity/conftest.py::golden("<module>")` / `golden_cases("<module>")` and compare with `numpy.testing.assert_allclose(actual, expected, rtol=case_rtol(module, case), atol=1e-12)`, where `case_rtol` honours the per-case `"rtol"` override and falls back to `meta["rtol"]`.
 
 ## Testing
-- Tests first. `tests/unit/` (pure Python behaviour, hypothesis property tests), `tests/parity/` (golden), `tests/sklearn_compat/`, `tests/torch/` (skip if torch absent).
+- Tests first. `tests/unit/` (pure Python behaviour, hypothesis property tests), `tests/parity/` (golden), `tests/sklearn_compat/`, `tests/torch_backend/` (skip if torch absent; not `tests/torch/`, which would shadow PyTorch as a namespace package when it is not installed).
 - Coverage ≥ 90% on touched module.
 
 ## Library docs rule (global CLAUDE.md)
