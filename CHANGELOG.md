@@ -6,9 +6,32 @@ All notable changes to this project are documented here. Format follows
 ## [Unreleased]
 
 ### Added
+- `fdatools.interop`, bridges to the wider Python stack:
+  - NumPy: `from_grid` / `to_grid` in either the fdatools `(n_points, n_curves)`
+    or the scikit-learn `(n_curves, n_points)` layout.
+  - SciPy: `to_scipy` / `from_scipy` convert spline curves to and from
+    `scipy.interpolate.BSpline`, exactly (same knots and coefficients).
+  - scikit-fda: `to_skfda` / `from_skfda`, exact for B-spline, polygonal,
+    Fourier, monomial and constant bases, through a grid otherwise.
+  - Panels: `from_panel` / `to_panel` for `(entity, time)` MultiIndex data, the
+    layout of `linearmodels` and `statsmodels`; unbalanced panels are smoothed
+    per entity.
+  - `functional_design` / `FunctionalDesign`: the design matrix of a
+    scalar-on-function model for any linear estimator (statsmodels OLS, GLM,
+    quantile regression; linearmodels PanelOLS, IV). `beta()` maps the
+    parameters back to `beta(t)`, and `band()` builds a pointwise band from the
+    estimator's covariance (classical, robust or clustered).
+- `econ` extra (pandas, statsmodels, linearmodels, scikit-fda) and a new
+  tutorial, "Econometrics and interop".
 - fdatools is on PyPI: `uv add fdatools`. Releases are published by
   `.github/workflows/release.yml` with PyPI trusted publishing (no API token);
   it uploads the files attached to the GitHub release.
+
+### Fixed
+- The test suite no longer fails without PyTorch. The `tests/torch/` folder
+  was imported as a fake `torch` namespace package, which broke
+  array-api-compat's type checks (`module 'torch' has no attribute 'Tensor'`).
+  It is renamed to `tests/torch_backend/`.
 
 ### Changed
 - Install instructions use uv only (`uv add fdatools`, extras as

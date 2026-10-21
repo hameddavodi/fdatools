@@ -1,6 +1,6 @@
 # Tutorials
 
-Six worked analyses, each from raw data to a result you can plot. They follow
+Seven worked analyses, each from raw data to a result you can plot. They follow
 the examples of Ramsay, Hooker and Graves, *Functional Data Analysis with R
 and MATLAB* (2009), so you can compare with the book and with R's `fda`.
 
@@ -15,6 +15,7 @@ Every code block runs as written, top to bottom, and ends with an
 | [Registration](registration.md) | landmark and continuous `register()`, warping functions, amplitude and phase with `.decompose()` | growth |
 | [Functional regression](regression.md) | `fregress()` with scalar and functional responses, formulas, `predict` / `stderr` / `cv`, the permutation F test | Canadian weather |
 | [Dynamics](dynamics.md) | principal differential analysis with `PDA`, `solve()`, the stability diagram, phase-plane plots | lip movement, growth |
+| [Econometrics and interop](econometrics.md) | `fdatools.interop`: NumPy, SciPy and scikit-fda conversions; panels for linearmodels; scalar-on-function regression with statsmodels (robust bands, GLMs, fixed effects) | growth, simulated panel |
 | [Machine learning](machine-learning.md) | scikit-learn `Pipeline` and `GridSearchCV`; PyTorch `BasisLayer`, `SmoothingLayer`, `FDataDataset` | growth |
 
 ## Data

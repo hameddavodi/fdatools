@@ -19,6 +19,11 @@ functional regression, curve registration and principal differential analysis.
   `smooth()`, one `register()`, one `.plot()`.
 - **Fits the Python stack.** scikit-learn estimators, NumPy or PyTorch arrays
   through the Array API (gradients flow), pandas and xarray I/O.
+- **Works with econometrics tools.** `fdatools.interop` converts curves to and
+  from SciPy and scikit-fda exactly, and to and from `(entity, time)` panels
+  for linearmodels. It also builds design matrices, so statsmodels or
+  linearmodels can fit scalar-on-function models and return `beta(t)` with a
+  robust confidence band.
 
 ## Install
 
@@ -30,7 +35,8 @@ With [uv](https://docs.astral.sh/uv/). For an extra, put it in brackets:
 `uv add "fdatools[plot]"`.
 
 Optional extras: `fdatools[plot]` (matplotlib), `fdatools[pandas]` (pandas + xarray),
-`fdatools[io]` (read R `.rds` files), `fdatools[torch]` (PyTorch). Python 3.10 to 3.13.
+`fdatools[io]` (read R `.rds` files), `fdatools[torch]` (PyTorch),
+`fdatools[econ]` (statsmodels, linearmodels, scikit-fda). Python 3.10 to 3.13.
 
 ## Quickstart
 

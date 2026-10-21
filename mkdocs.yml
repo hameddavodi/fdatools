@@ -68,6 +68,7 @@ nav:
       - Functional regression: tutorials/regression.md
       - Dynamics: tutorials/dynamics.md
       - Machine learning: tutorials/machine-learning.md
+      - Econometrics and interop: tutorials/econometrics.md
   - API reference:
       - api/index.md
       - Basis systems: api/basis.md
@@ -84,4 +85,5 @@ nav:
       - PyTorch layers: api/nn.md
       - Datasets: api/datasets.md
       - Input and output: api/io.md
+      - Interoperability: api/interop.md
   - Developer conventions: dev/conventions.md

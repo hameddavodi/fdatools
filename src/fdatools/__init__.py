@@ -14,7 +14,7 @@ Examples
 
 from typing import TYPE_CHECKING, Any
 
-from fdatools import datasets, density, profiling, sparse, stats
+from fdatools import datasets, density, interop, profiling, sparse, stats
 from fdatools.basis import (
     Basis,
     BSpline,
@@ -74,6 +74,7 @@ __all__ = [
     "fregress",
     "from_pandas",
     "inprod",
+    "interop",
     "landmark_register",
     "linmod",
     "phase_plane",

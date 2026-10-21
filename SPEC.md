@@ -310,6 +310,20 @@ fd.to_xarray() / fd.to_pandas(t)
 fdt.read_rds("weather.rds")                  # ingest R fda objects directly
 ```
 
+### 5.4 Interoperability (`fdatools.interop`)
+
+Added after 1.1.0 on user request; extends the frozen surface with one module.
+
+```python
+from fdatools import interop
+interop.from_grid(X, t, curve_axis=0) / interop.to_grid(fd, curve_axis=0)  # NumPy (either layout)
+interop.to_scipy(fd) / interop.from_scipy(spl)                            # scipy BSpline, exact
+interop.to_skfda(fd) / interop.from_skfda(obj)                            # scikit-fda, exact for shared bases
+interop.from_panel(df, "y") / interop.to_panel(fd, t)                     # (entity, time) panels: linearmodels
+d = interop.functional_design({"x": fd}, {"w": w})                        # design for any linear estimator
+d.beta(res.params); d.band(res.params, res.cov_params())                  # back to beta(t) + band
+```
+
 ---
 
 ## 6. Performance Spec

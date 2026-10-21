@@ -11,7 +11,7 @@ license = "BSD-3-Clause"
 license-files = ["LICENSE"]
 requires-python = ">=3.10"
 authors = [{ name = "Hamed Davodi", email = "hamed.davodi94@gmail.com" }]
-keywords = ["functional data analysis", "fda", "splines", "smoothing", "fpca"]
+keywords = ["functional data analysis", "fda", "splines", "smoothing", "fpca", "econometrics", "panel data"]
 classifiers = [
   "Development Status :: 5 - Production/Stable",
   "Intended Audience :: Developers",
@@ -39,6 +39,8 @@ torch = ["torch>=2.2"]
 pandas = ["pandas>=2.2", "xarray>=2024.1"]
 plot = ["matplotlib>=3.8"]
 io = ["rdata>=0.11"]
+# Econometrics / FDA ecosystem bridges used by fdatools.interop (tests and tutorial).
+econ = ["pandas>=2.2", "statsmodels>=0.14", "linearmodels>=6.0", "scikit-fda>=0.9"]
 # Only for tools/make_golden.py (it falls back to Rscript without it). Needs R to build.
 golden = ["rpy2>=3.5"]
 dev = [
@@ -108,7 +110,7 @@ strict = true
 warn_unreachable = true
 
 [[tool.mypy.overrides]]
-module = ["array_api_compat.*", "sklearn.*", "matplotlib.*", "torch.*", "rdata.*", "xarray.*", "hypothesis.*", "rpy2.*"]
+module = ["array_api_compat.*", "sklearn.*", "matplotlib.*", "torch.*", "rdata.*", "xarray.*", "hypothesis.*", "rpy2.*", "skfda.*", "statsmodels.*", "linearmodels.*"]
 ignore_missing_imports = true
 
 [tool.pyright]

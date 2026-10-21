@@ -51,6 +51,7 @@ PUBLIC_MODULES = [
     "fdatools.profiling",
     "fdatools.datasets",
     "fdatools.io",
+    "fdatools.interop",
 ]
 # fdatools.nn imports torch at the top; without the extra it cannot be inspected.
 HAS_TORCH = importlib.util.find_spec("torch") is not None
@@ -75,6 +76,8 @@ RESULT_CLASSES = [
     "fdatools.profiling.ProfileResult",
     "fdatools.profiling.InnerFit",
     "fdatools.io.LongData",
+    "fdatools.interop.PanelCurves",
+    "fdatools.interop.FunctionalDesign",
 ]
 
 

@@ -36,6 +36,7 @@ TUTORIALS = [
     "regression.md",
     "dynamics.md",
     "machine-learning.md",
+    "econometrics.md",
 ]
 BLOCK = re.compile(r"^```python\n(.*?)^```", re.DOTALL | re.MULTILINE)
 REQUIRES = re.compile(r"^# requires: (\w+)\s*$")

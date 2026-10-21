@@ -2,7 +2,7 @@
 
 One page per module of fdatools' public API. Every name in `fdatools.__all__`, every
 public function and class of `fdatools.stats`, `fdatools.sparse`, `fdatools.density`,
-`fdatools.profiling`, `fdatools.datasets`, `fdatools.io` and `fdatools.nn`, and every result class is documented here. For worked examples,
+`fdatools.profiling`, `fdatools.datasets`, `fdatools.io`, `fdatools.interop` and `fdatools.nn`, and every result class is documented here. For worked examples,
 see the [tutorials](../tutorials/index.md).
 
 | Module | Contents |
@@ -21,3 +21,4 @@ see the [tutorials](../tutorials/index.md).
 | [PyTorch layers](nn.md) | `BasisLayer`, `SmoothingLayer`, `FDataDataset` (optional extra) |
 | [Datasets](datasets.md) | 14 `load_*` loaders and the dataclasses they return (`Growth`, `CanadianWeather`, `Lip`, ...) |
 | [Input and output](io.md) | `from_pandas`, `LongData`, `to_pandas`, `to_xarray`, `read_rds` |
+| [Interoperability](interop.md) | `from_grid`, `to_grid`, `to_scipy`, `from_scipy`, `to_skfda`, `from_skfda`, `from_panel`, `to_panel`, `PanelCurves`, `functional_design`, `FunctionalDesign` |
