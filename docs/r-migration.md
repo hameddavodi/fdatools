@@ -188,13 +188,20 @@ In the tables below, `fb` is `import fdatools as fdt`.
 downloaded once from the project's GitHub release, checked against a SHA-256
 checksum, and cached in `~/.cache/fdatools` (override with `FDATOOLS_DATA_DIR`).
 
-## Ecosystem I/O and deep learning
+## Ecosystem I/O, econometrics interop and deep learning
 
 | R `fda` | fdatools |
 |---|---|
 | `readRDS` on a saved `fd`, `bifd` or `basisfd` | `fdt.read_rds("weather.rds")` |
 | (none) | `fdt.from_pandas(df, id_col, t_col, y_col)` (long format) |
 | (none) | `fd.to_pandas(t)`, `fd.to_xarray(t)` |
+| `eval.fd` on a grid, then `t()` | `interop.to_grid(fd, t, curve_axis=0)` (NumPy, one row per curve) |
+| `Data2fd` / `smooth.basis` on a matrix | `interop.from_grid(X, t, curve_axis=0)` |
+| (none) | `interop.to_scipy(fd)`, `interop.from_scipy(spl)`: exact `scipy.interpolate.BSpline` |
+| (none) | `interop.to_skfda(fd)`, `interop.from_skfda(obj)`: scikit-fda `FDataBasis` / `FDataGrid` |
+| (none) | `interop.from_panel(df, "y")`, `interop.to_panel(fd, t)`: `(entity, time)` panels |
+| `Z <- inprod(xfd, betabasis)` then `lm(y ~ Z)` | `d = interop.functional_design({"x": xfd})`, fit with statsmodels / linearmodels, then `d.beta(params)` |
+| (none) | `d.band(params, cov, simultaneous=True)`, `d.predict(params, x_new)` |
 | (none) | `fdt.nn.BasisLayer(basis)`: differentiable `fd(t)` for PyTorch |
 | (none) | `fdt.nn.FDataDataset(fd, labels)`: `DataLoader`-ready dataset |
 

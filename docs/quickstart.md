@@ -112,8 +112,27 @@ frame = girls[0:3].to_pandas(np.linspace(1.0, 18.0, 5))
 frame.shape
 ```
 
+## 7. NumPy, SciPy and econometrics libraries
+
+`fdatools.interop` moves curves to other libraries. `to_grid` gives a plain
+array with one row per curve, the layout scikit-learn expects. `to_scipy`
+gives an exact `scipy.interpolate.BSpline` with the same knots and
+coefficients. `functional_design` builds a design matrix for statsmodels or
+linearmodels.
+
+```python
+from fdatools import interop
+
+t, X = interop.to_grid(fit.fd, n_points=50, curve_axis=0)
+X.shape                                         # (54, 50)
+spl = interop.to_scipy(fit.fd)                  # scipy BSpline, exact
+design = interop.functional_design({"height": fit.fd}, method="fpca", n_components=3)
+design.columns                                  # ('const', 'height[pc1]', ...)
+```
+
 ## Next
 
-- The [tutorials](tutorials/index.md) work through six full analyses.
+- The [tutorials](tutorials/index.md) work through seven full analyses; the
+  [econometrics and interop](tutorials/econometrics.md) one covers this module.
 - [Migrating from R `fda`](r-migration.md) maps each R function to fdatools.
 - The [API reference](api/index.md) documents every argument.

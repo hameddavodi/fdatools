@@ -20,10 +20,11 @@ functional regression, curve registration and principal differential analysis.
 - **Fits the Python stack.** scikit-learn estimators, NumPy or PyTorch arrays
   through the Array API (gradients flow), pandas and xarray I/O.
 - **Works with econometrics tools.** `fdatools.interop` converts curves to and
-  from SciPy and scikit-fda exactly, and to and from `(entity, time)` panels
-  for linearmodels. It also builds design matrices, so statsmodels or
-  linearmodels can fit scalar-on-function models and return `beta(t)` with a
-  robust confidence band.
+  from NumPy, SciPy and scikit-fda (exactly, where the bases match), and to and
+  from `(entity, time)` panels for linearmodels. Its design matrices let
+  statsmodels or linearmodels fit scalar-on-function models (plain basis or
+  functional PCA regression). You get back `beta(t)`, robust pointwise or
+  simultaneous confidence bands, and predictions for new curves.
 
 ## Install
 
@@ -53,10 +54,30 @@ print(speed.mean()(np.array([5.0, 12.0])))           # curves are callable: eval
 print(fdt.inprod(girls[0], girls[0]))                 # L2 inner product of one curve
 ```
 
+### With statsmodels
+
+Regress a scalar on a curve with any estimator, then read the coefficient
+function back:
+
+```python
+# requires: statsmodels
+import statsmodels.api as sm
+from fdatools import interop
+
+height = fdt.smooth(growth.hgtf, growth.age, basis=basis).fd
+adult = height(np.array([18.0]))[0]                   # height at 18
+design = interop.functional_design({"speed": height.derivative()}, n_basis=5)
+fit = sm.OLS(adult, design.to_frame()).fit(cov_type="HC3")   # robust covariance
+beta = design.beta(fit.params)                        # beta(t) as an FData
+t, est, lower, upper = design.band(fit.params, fit.cov_params(), simultaneous=True)
+```
+
 Next steps: penalised smoothing with automatic λ (`smooth`), functional PCA
 (`FPCA`) and more in the [quickstart guide](https://hameddavodi.github.io/fdatools/quickstart/).
 Coming from R? The [migration table](https://hameddavodi.github.io/fdatools/r-migration/)
-maps every `fda` function to its fdatools equivalent.
+maps every `fda` function to its fdatools equivalent. Working with NumPy,
+SciPy, scikit-fda, statsmodels or linearmodels? See the
+[econometrics and interop tutorial](https://hameddavodi.github.io/fdatools/tutorials/econometrics/).
 
 ## Documentation
 
