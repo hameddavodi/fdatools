@@ -108,6 +108,28 @@ beta_accel = logit_design.beta(logit.params)           # FData, one curve
 beta_accel.basis.n_basis
 ```
 
+### Principal component regression, prediction and simultaneous bands
+
+With a fixed basis, an unpenalised fit can be noisy. `method="fpca"` expands
+`beta(t)` in the first principal components of the covariate instead. This is
+functional principal component regression, and it regularises by truncation.
+`predict` builds the same design for new curves (same functions, same
+centring), which gives out-of-sample forecasts. A simultaneous (sup-t) band
+covers the whole curve at once, and `df=` uses Student-t critical values for
+small samples.
+
+```python
+# requires: statsmodels
+train, test = height[:70], height[70:]
+pcr = interop.functional_design({"height": train}, method="fpca", n_components=3)
+fit = sm.OLS(h18[:70], pcr.to_frame()).fit()
+forecast = pcr.predict(fit.params, {"height": test})      # 23 out-of-sample predictions
+rmse = float(np.sqrt(np.mean((forecast - h18[70:]) ** 2)))
+t, est, lo, hi = pcr.band(fit.params, fit.cov_params(), df=fit.df_resid)
+_, _, slo, shi = pcr.band(fit.params, fit.cov_params(), df=fit.df_resid, simultaneous=True)
+bool(np.all(shi - slo >= hi - lo)), rmse < 1.0
+```
+
 With ordinary least squares the coefficient function equals
 `fdt.fregress(..., lam=0)` with the same bases. Use `fregress` when you want a
 roughness penalty, and the design route when you want another estimator.

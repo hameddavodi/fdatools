@@ -360,3 +360,120 @@ def test_design_errors() -> None:
         design.band(np.ones(5), np.eye(3))
     with pytest.raises(ValueError, match="level"):
         design.band(np.ones(5), np.eye(5), level=1.0)
+
+
+def test_panel_unbalanced_matches_per_entity_smooths_and_rejects_duplicates() -> None:
+    pd = pytest.importorskip("pandas")
+    frame = _panel(balanced=False).sample(frac=1.0, random_state=3)  # shuffled rows
+    basis = fdt.BSpline(domain=(2000.0, 2014.0), n_basis=6)
+    panel = from_panel(frame, "sales", basis=basis, lam=1e-3)
+    clean = frame["sales"].dropna()
+    for k, firm in enumerate(panel.entities):
+        rows = clean.xs(firm, level="firm").sort_index()
+        alone = fdt.smooth(rows.to_numpy(), rows.index.to_numpy(), basis=basis, lam=1e-3)
+        assert_allclose(panel.fd.coefs[:, k], alone.fd.coefs[:, 0], rtol=1e-8, atol=1e-10)
+    doubled = pd.concat([frame["sales"], frame["sales"].iloc[:1]])
+    with pytest.raises(ValueError, match="repeats"):
+        from_panel(doubled)
+    with pytest.raises(ValueError, match="no non-missing"):
+        from_panel(frame["sales"] * np.nan)
+
+
+# ------------------------------------------- prediction, FPCA, simultaneous
+
+
+def test_transform_and_predict_rebuild_the_design_for_new_curves() -> None:
+    x, w, y, beta_basis, _ = _scalar_on_function()
+    design = functional_design({"x": x}, {"w": w}, beta_basis=beta_basis)
+    assert_allclose(design.transform({"x": x}, {"w": w}), design.matrix)
+    params, *_ = np.linalg.lstsq(design.matrix, y, rcond=None)
+    fresh, _, _, _, _ = _scalar_on_function(n=25)
+    # The same curves in another (nested, finer) basis give the same integrals.
+    finer = fdt.BSpline(domain=(0.0, 1.0), breaks=np.linspace(0.0, 1.0, 15).tolist())
+    t = np.linspace(0.0, 1.0, 400)
+    refit = fdt.smooth(fresh(t), t, basis=finer, lam=0.0).fd
+    w_fresh = RNG.standard_normal(25)
+    exact = design.predict(params, {"x": fresh}, {"w": w_fresh})
+    assert_allclose(design.predict(params, refit, {"w": w_fresh}), exact, atol=1e-6)
+    with pytest.raises(ValueError, match="missing covariates"):
+        design.transform({"x": fresh})
+    with pytest.raises(ValueError, match="disagree"):
+        design.transform({"x": fresh}, {"w": np.ones(3)})
+
+
+def test_fpca_design_is_principal_component_regression() -> None:
+    x, _, y, _, _ = _scalar_on_function(noise=0.2)
+    design = functional_design(x, method="fpca", n_components=3)
+    assert design.columns == ("const", "x[pc1]", "x[pc2]", "x[pc3]")
+    pca = fdt.FPCA(n=3).fit(x)
+    # Centred scores of an unpenalised FPCA are the integrals against the harmonics.
+    assert_allclose(design.matrix[:, 1:], pca.scores, atol=1e-8)
+    params, *_ = np.linalg.lstsq(design.matrix, y, rcond=None)
+    beta = design.beta(params)
+    expected = pca.harmonics.coefs @ params[1:]
+    assert_allclose(beta.coefs[:, 0], expected)
+    # Keeping every component spans the covariate's own basis: same fit as method="basis".
+    full = functional_design(x, method="fpca", n_components=x.basis.n_basis)
+    same = functional_design(x, beta_basis=x.basis)
+    fit_full, *_ = np.linalg.lstsq(full.matrix, y, rcond=None)
+    fit_same, *_ = np.linalg.lstsq(same.matrix, y, rcond=None)
+    assert_allclose(full.matrix @ fit_full, same.matrix @ fit_same, atol=1e-8)
+    t = np.linspace(0.0, 1.0, 9)
+    assert_allclose(full.beta(fit_full)(t), same.beta(fit_same)(t), atol=1e-6)
+    # Prediction re-centres new curves at the training mean.
+    assert_allclose(design.predict(params, x), design.matrix @ params)
+
+
+def test_explicit_functions_can_be_passed_as_fdata() -> None:
+    x, _, _, _, _ = _scalar_on_function()
+    pca = fdt.FPCA(n=2).fit(x)
+    design = functional_design({"x": x}, beta_basis={"x": pca.harmonics})
+    assert design.columns == ("const", "x[0]", "x[1]")
+    assert_allclose(design.matrix[:, 1:], fdt.inprod(x, pca.harmonics))
+
+
+def test_simultaneous_band_is_wider_and_has_simultaneous_coverage() -> None:
+    x, _, _, beta_basis, true_beta = _scalar_on_function(n=80)
+    design = functional_design(x, beta_basis=beta_basis)
+    xtx_inv = np.linalg.inv(design.matrix.T @ design.matrix)
+    t = np.linspace(0.0, 1.0, 51)
+    truth = true_beta(t)[:, 0]
+    hits_point = hits_sup = 0
+    trials = 300
+    for _ in range(trials):
+        y = design.matrix @ np.r_[0.7, true_beta.coefs[:, 0]] + RNG.standard_normal(80)
+        params = xtx_inv @ design.matrix.T @ y
+        cov = xtx_inv  # known unit noise variance
+        _, _, lo, hi = design.band(params, cov, t=t)
+        _, _, slo, shi = design.band(params, cov, t=t, simultaneous=True)
+        assert np.all(shi - slo >= hi - lo - 1e-12)
+        hits_point += bool(np.all((lo <= truth) & (truth <= hi)))
+        hits_sup += bool(np.all((slo <= truth) & (truth <= shi)))
+    assert hits_sup / trials > 0.9  # nominal 0.95 for the whole curve
+    assert hits_point / trials < hits_sup / trials
+
+
+def test_band_with_degrees_of_freedom_and_reproducible_simulation() -> None:
+    x = _curves(30, fdt.BSpline(domain=(0.0, 1.0), n_basis=8))
+    design = functional_design(x, n_basis=4)
+    params, cov = np.ones(5), np.eye(5)
+    _, _, lo_z, hi_z = design.band(params, cov, n_points=11)
+    _, _, lo_t, hi_t = design.band(params, cov, n_points=11, df=5)
+    assert np.all(hi_t - lo_t > hi_z - lo_z)
+    first = design.band(params, cov, n_points=11, simultaneous=True, df=5)
+    again = design.band(params, cov, n_points=11, simultaneous=True, df=5)
+    assert_allclose(first[2], again[2])
+    zero = design.band(params, np.zeros((5, 5)), n_points=11, simultaneous=True)
+    assert_allclose(zero[2], zero[3])
+    with pytest.raises(ValueError, match="df"):
+        design.band(params, cov, df=0)
+
+
+def test_new_design_argument_errors() -> None:
+    x = _curves(6)
+    with pytest.raises(ValueError, match="method"):
+        functional_design(x, method="pls")
+    with pytest.raises(ValueError, match="n_components"):
+        functional_design(x, method="fpca", n_components=0)
+    with pytest.raises(ValueError, match="coefficient functions"):
+        functional_design(x, beta_basis=fdt.FData(np.ones((8, 2, 2)), x.basis))

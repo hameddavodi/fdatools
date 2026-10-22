@@ -15,12 +15,15 @@ All notable changes to this project are documented here. Format follows
     Fourier, monomial and constant bases, through a grid otherwise.
   - Panels: `from_panel` / `to_panel` for `(entity, time)` MultiIndex data, the
     layout of `linearmodels` and `statsmodels`; unbalanced panels are smoothed
-    per entity.
+    per entity, and duplicate `(entity, time)` rows are rejected.
   - `functional_design` / `FunctionalDesign`: the design matrix of a
     scalar-on-function model for any linear estimator (statsmodels OLS, GLM,
     quantile regression; linearmodels PanelOLS, IV). `beta()` maps the
     parameters back to `beta(t)`, and `band()` builds a pointwise band from the
     estimator's covariance (classical, robust or clustered).
+    `method="fpca"` gives functional principal component regression;
+    `transform()` / `predict()` build the same design for new curves; `band()`
+    also gives simultaneous (sup-t) bands and Student-t critical values (`df=`).
 - `econ` extra (pandas, statsmodels, linearmodels, scikit-fda) and a new
   tutorial, "Econometrics and interop".
 - fdatools is on PyPI: `uv add fdatools`. Releases are published by
