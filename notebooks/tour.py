@@ -1285,6 +1285,7 @@ check("sklearn pipeline classifies boys/girls well above chance", acc > 0.8, rou
 
 # %%
 import torch
+
 from fdatools.nn import BasisLayer, FDataDataset, SmoothingLayer
 
 torch.manual_seed(0)

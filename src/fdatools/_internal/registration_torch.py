@@ -62,6 +62,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Any
 
 import torch
+
 from fdatools import _linalg
 from fdatools._backend import default_namespace, is_torch, to_numpy
 from fdatools.core import FData

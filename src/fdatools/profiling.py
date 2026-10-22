@@ -581,9 +581,8 @@ class ODEModel:
         ... )
         -4.0
         """
-        from torch.func import jacfwd, jacrev, vmap
-
         import torch
+        from torch.func import jacfwd, jacrev, vmap
 
         def tensor(a: Array) -> Any:
             return torch.as_tensor(to_numpy(a), dtype=torch.float64)
