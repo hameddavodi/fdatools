@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1
 # Dev/parity image: Python 3.11 + R 4.x + R fda 6.3.0 + rpy2.
-FROM rocker/r-ver:4.4.2
+FROM rocker/r-ver:4.6.2
 
 ENV DEBIAN_FRONTEND=noninteractive \
     PIP_NO_CACHE_DIR=1 \
